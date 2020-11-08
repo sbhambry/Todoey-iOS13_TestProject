@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 
 
-class ToDoListViewController: UITableViewController{
+class ToDoListViewController: UITableViewController {
     
     var itemArray = [Item]()
     // Using NSCoder// accessing the app documents
@@ -20,8 +20,10 @@ class ToDoListViewController: UITableViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-        loadItems()
+//        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+            
+        loadItems() // request param's default value is passed here i.e. Item.fetchRequest()
+        
 
         
 //        let newItem = Item()
@@ -133,13 +135,42 @@ class ToDoListViewController: UITableViewController{
         tableView.reloadData() // loads the new data added
     }
     
-    func loadItems() {
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+        
+        do {
+            itemArray = try context.fetch(request)
+        } catch {
+            print("Error fetching data from context \(error)")
+            tableView.reloadData()
+        }
+    }
+    
+   
+}
+
+//MARK: - Search Bar methods
+
+extension ToDoListViewController: UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
+
+//  search by passing request (containing search text)
+//  NSPredicate is used for doing expression search similar to RegEx
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        
+        
+// sortDescriptorS plural since it can accept an array of sortDescriptors.However, we need to pass only one.
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        
         do {
             itemArray = try context.fetch(request)
         } catch {
             print("Error fetching data from context \(error)")
         }
+        tableView.reloadData()
+        
+//        loadItems(with: request)
     }
 }
 
