@@ -21,9 +21,7 @@ class ToDoListViewController: UITableViewController {
         super.viewDidLoad()
         
 //        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-            
         loadItems() // request param's default value is passed here i.e. Item.fetchRequest()
-        
 
         
 //        let newItem = Item()
@@ -137,12 +135,13 @@ class ToDoListViewController: UITableViewController {
     
     func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
         
+//        let request: NSFetchRequest<Item> = Item.fetchRequest()
         do {
             itemArray = try context.fetch(request)
         } catch {
             print("Error fetching data from context \(error)")
-            tableView.reloadData()
         }
+        tableView.reloadData()
     }
     
    
@@ -162,15 +161,15 @@ extension ToDoListViewController: UISearchBarDelegate {
         
 // sortDescriptorS plural since it can accept an array of sortDescriptors.However, we need to pass only one.
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+//
+//        do {
+//            itemArray = try context.fetch(request)
+//        } catch {
+//            print("Error fetching data from context \(error)")
+//        }
+//        tableView.reloadData()
         
-        do {
-            itemArray = try context.fetch(request)
-        } catch {
-            print("Error fetching data from context \(error)")
-        }
-        tableView.reloadData()
-        
-//        loadItems(with: request)
+        loadItems(with: request)
     }
 }
 
